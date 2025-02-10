@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form with Conditional Inputs</title>
+    <script type="text/javascript">
+        // Function to reset form values, uncheck checkboxes, and enable all fields on page load or refresh
+        window.onload = function() {
+            // Get all form fields
+            const formFields = document.querySelectorAll("input[type='text'], input[type='number'], input[type='date']");
+
+            // Reset all form fields
+            formFields.forEach(field => {
+                field.value = ''; // Reset input field values
+            });
+
+            // Uncheck all checkboxes
+            const checkboxes = document.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false; // Uncheck the checkbox
+            });
+
+            // Enable all form fields
+            formFields.forEach(field => {
+                field.disabled = true; // Enable all fields
+            });
+
+            // Also enable all checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.disabled = false; // Enable all checkboxes
+            });
+        };
+
+        // Function to toggle input fields based on checkbox state
+        function toggleInputField(checkbox, fieldId) {
+            var inputField = document.getElementById(fieldId);
+            if (checkbox.checked) {
+                inputField.disabled = false; // Enable the field if the checkbox is checked
+            } else {
+                inputField.disabled = true;  // Disable the field if the checkbox is unchecked
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Submit Form Data</h1>
+
+    <!-- Show confirmation message if form is submitted -->
+    {% if form_submitted %}
+        <p>Form submitted successfully!</p>
+
+        <h2>Submitted Data:</h2>
+        <ul>
+            {% for data in form_data %}
+                <li>Number: {{ data.number_field }}, Text: {{ data.text_field }}, Date: {{ data.date_field }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Render the form -->
+    <form method="POST">
+        {% csrf_token %}
+        
+        <!-- Number Field -->
+        <div>
+            <label for="number_field">Number Field:</label>
+            <input type="number" id="number_field" name="number_field" value="{{ form.number_field.value }}" disabled>
+            <input type="checkbox" id="is_number_checked" name="is_number_checked" 
+                   {% if form.is_number_checked.value %}checked{% endif %}
+                   onchange="toggleInputField(this, 'number_field')">
+            <label for="is_number_checked">Include this field</label>
+        </div>
+
+        <!-- Text Field -->
+        <div>
+            <label for="text_field">Text Field:</label>
+            <input type="text" id="text_field" name="text_field" value="{{ form.text_field.value }}" disabled>
+            <input type="checkbox" id="is_text_checked" name="is_text_checked" 
+                   {% if form.is_text_checked.value %}checked{% endif %}
+                   onchange="toggleInputField(this, 'text_field')">
+            <label for="is_text_checked">Include this field</label>
+        </div>
+
+        <!-- Date Field -->
+        <div>
+            <label for="date_field">Date Field:</label>
+            <input type="date" id="date_field" name="date_field" value="{{ form.date_field.value }}" disabled>
+            <input type="checkbox" id="is_date_checked" name="is_date_checked" 
+                   {% if form.is_date_checked.value %}checked{% endif %}
+                   onchange="toggleInputField(this, 'date_field')">
+            <label for="is_date_checked">Include this field</label>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
